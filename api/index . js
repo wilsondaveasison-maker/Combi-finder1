@@ -1,51 +1,14 @@
-const express = require("express");
-const axios = require("axios");
-const cors = require("cors");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.get("/api/servers/:placeId", async (req, res) => {
-    // Set headers explicitly to allow access from the Roblox game environment
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-
-    const placeId = req.params.placeId;
-
-    try {
-       
-        const url = `https://games.roblox.com/v1/games/${placeId}/servers/Public?sortOrder=Asc&limit=100`;
-
-        const response = await axios.get(url, {
-
-             headers: {
-                 'User-Agent': 'Roblox/1.0 (CombiFinderAPI)'
-             }
-         });
-        
-        const data = response.data;
-        
-        if (!data || !data.data || !Array.isArray(data.data)) {
-            console.error("Roblox API returned invalid data structure.");
-            return res.status(200).json({ status: 'error', message: 'Invalid Roblox API response.', servers: [] });
-        }
-
-        return res.status(200).json({
-            status: 'success',
-            servers: data.data.map(server => ({
-                id: server.id,
-                playing: server.playing,
-                maxPlayers: server.maxPlayers,
-                fps: server.fps
-            }))
-        });
-
-    } catch (err) {
-        
-        console.error("API Execution Error:", err.message);
-        return res.status(500).json({ status: 'error', message: 'Internal server error during fetch.', details: err.message });
-    }
-});
-
-module.exports = app;
+{
+  "name": "roblox-server-api",
+  "version": "1.0.0",
+  "description": "API to fetch Roblox server information via Vercel.",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "axios": "^1.7.2",
+    "cors": "^2.8.5"
+  }
+}
