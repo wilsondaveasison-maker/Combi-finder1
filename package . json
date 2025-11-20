@@ -1,9 +1,14 @@
 {
   "name": "roblox-server-api",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "API to fetch Roblox server information via Vercel.",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
   "dependencies": {
-    "express": "^4.18.2",
-    "node-fetch": "^3.3.2",
+    "express": "^4.19.2",
+    "axios": "^1.7.2",
     "cors": "^2.8.5"
   }
 }
