@@ -1,0 +1,42 @@
+import express from "express";
+import fetch from "node-fetch";
+import cors from "cors";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
+
+// Get servers from Roblox
+app.get("/api/servers/:placeId", async (req, res) => {
+  const placeId = req.params.placeId;
+
+  try {
+    const url = `https://games.roblox.com/v1/games/${placeId}/servers/Public?sortOrder=Asc&limit=100`;
+
+    const data = await fetch(url).then(res => res.json());
+
+    if (!data || !data.data) {
+      return res.json({ success: false, servers: [] });
+    }
+
+    return res.json({
+      success: true,
+      servers: data.data.map(server => ({
+        id: server.id,
+        playing: server.playing,
+        maxPlayers: server.maxPlayers,
+        fps: server.fps
+      }))
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, servers: [] });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log("API running on port " + PORT);
+});
