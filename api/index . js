@@ -1,16 +1,11 @@
-// Vercel Serverless Function - api/index.js
-// This uses CommonJS module syntax and is exported via module.exports.
-// This is the most compatible setup for Vercel running Express.
-
 const express = require("express");
-const axios = require("axios"); // Used for making stable external HTTP requests
+const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
-app.use(cors()); // Enables Cross-Origin Resource Sharing
+app.use(cors());
 app.use(express.json());
 
-// Main endpoint to fetch public servers for a given Place ID
 app.get("/api/servers/:placeId", async (req, res) => {
     // Set headers explicitly to allow access from the Roblox game environment
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,26 +14,23 @@ app.get("/api/servers/:placeId", async (req, res) => {
     const placeId = req.params.placeId;
 
     try {
-        // Roblox API URL to fetch public servers
+       
         const url = `https://games.roblox.com/v1/games/${placeId}/servers/Public?sortOrder=Asc&limit=100`;
 
-        // Fetch data from Roblox using axios
         const response = await axios.get(url, {
-             // Including a User-Agent header is good practice for external APIs
+
              headers: {
                  'User-Agent': 'Roblox/1.0 (CombiFinderAPI)'
              }
          });
         
-        const data = response.data; // axios automatically parses JSON
+        const data = response.data;
         
-        // Basic validation of the Roblox API response
         if (!data || !data.data || !Array.isArray(data.data)) {
             console.error("Roblox API returned invalid data structure.");
             return res.status(200).json({ status: 'error', message: 'Invalid Roblox API response.', servers: [] });
         }
 
-        // Map the results to a simplified format for the Roblox client script
         return res.status(200).json({
             status: 'success',
             servers: data.data.map(server => ({
@@ -50,11 +42,10 @@ app.get("/api/servers/:placeId", async (req, res) => {
         });
 
     } catch (err) {
-        // Log the error detail for debugging in Vercel logs
+        
         console.error("API Execution Error:", err.message);
         return res.status(500).json({ status: 'error', message: 'Internal server error during fetch.', details: err.message });
     }
 });
 
-// Vercel runs the exported app instance on demand. app.listen() is not used.
 module.exports = app;
